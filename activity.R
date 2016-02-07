@@ -1,24 +1,16 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+library(knitr)
+opts_chunk$set(echo = TRUE, results = 'hold')
 
-
-## Loading and preprocessing the data
-
-```{r echo=TRUE}
+#Loading and preprocessing the data
 ##reading data into a data frame
 rawData <- read.csv("activity.csv", header = TRUE)
+
 ##First columnn of this data frame contains 2304 missing values. We have to remove this.
 ##Removing missing values which are denote by "NA".
-
 cleanData <- rawData[which(!(is.na(rawData$steps))), ]
-```
 
-## What is mean total number of steps taken per day?
-```{r echo=TRUE}
+#What is mean total number of steps taken per day?
+
 steps_Per_Day <- aggregate(steps ~ date, cleanData, sum)
 colnames(steps_Per_Day) <- c("date", "number of steps")
 
@@ -27,9 +19,8 @@ hist(steps_Per_Day$`number of steps`, breaks = nrow(steps_Per_Day), main = " ", 
 ##Calculating mean and median of the number of steps taken per day
 mean_steps_per_day <- mean(steps_Per_Day$`number of steps`)
 median_steps_per_day <- median(steps_Per_Day$`number of steps`)
-```
-## What is the average daily activity pattern?
-```{r echo = TRUE}
+
+#What is the average daily activity pattern?
 ##aggrefating number of steps order by 5-minute interval
 step_interval <- aggregate(cleanData$steps, FUN = mean, by = list(interval = cleanData$interval))
 colnames(step_interval) <- c("interval", "mean_steps")
@@ -42,9 +33,8 @@ print(x)
 
 ##Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 max_step_interval <- step_interval[which.max(step_interval$mean_steps), 1]
-```
-## Imputing missing values
-```{r echo=TRUE}
+
+#Imputing missing values
 ##Reporting total number of missing values
 ##The missing values are only in first column
 missing_value_count <- sum(is.na(rawData$steps))
@@ -68,9 +58,8 @@ mean_steps_per_day2 <- mean(steps_Per_Day2$`number of steps`)
 median_steps_per_day2 <- median(steps_Per_Day2$`number of steps`)
 ##The imputation of missing values has not changed the mean and median drastically.
 ##Though the frequency of the intervals has increased as expected.
-```
-## Are there differences in activity patterns between weekdays and weekends?
-```{r echo=TRUE}
+
+#Are there differences in activity patterns between weekdays and weekends?
 cleanData2$date <- as.Date(cleanData2$date)
 
 day_of_week <- weekdays(cleanData2$date)
@@ -87,4 +76,3 @@ colnames(steps_by_weekday) <- c("interval", "day", "avg_steps")
 g <- ggplot(steps_by_weekday, aes(steps_by_weekday$interval, steps_by_weekday$avg_steps))
 g <- g + geom_line() + facet_grid(day~.) + labs(y = "Number of steps", x = "5-Minute Interval")
 print(g)
-```
